@@ -1,19 +1,20 @@
 version: "3.8"
 
 services:
-  mongodb:
-    restart: unless-stopped
-    image: mongo:latest
-    container_name: mongodb
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=${MONGOADMIN}
-      - MONGO_INITDB_ROOT_PASSWORD=${MONGOPASS}
-    networks:
-      - backend
+  zookeeper:
+    image: zookeeper:3.6
     ports:
-      - "27017:27017"
-    volumes:
-      - mongo-data:/data/db
+      - "2181:2181"
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: ${KAFKA_ZOOKEEPER_CONNECT}
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: ${KAFKA_ADVERTISED_LISTENERS}
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    ports:
+      - "9092:9092"
 
   logger:
     restart: unless-stopped
@@ -22,18 +23,16 @@ services:
       dockerfile: Dockerfile
     container_name: logger
     environment:
-      - MONGODB_URL=${MONGOURL}
+      - KAFKA_HOST=${KAFKA_HOST}
     depends_on:
-      - mongodb
+      - zookeeper
+      - kafka
     networks:
       - backend
     ports:
-      - "3001:3001"
+      - "3009:3009"
     volumes:
       - .:/logger
-
-volumes:
-  mongo-data:
 
 networks:
   backend:

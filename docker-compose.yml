@@ -1,20 +1,53 @@
 version: "3.8"
 
 services:
-  zookeeper:
-    image: zookeeper:3.6
-    ports:
-      - "2181:2181"
-  kafka:
-    image: confluentinc/cp-kafka:latest
+  #  zookeeper:
+  #    image: zookeeper:3.6
+  #    container_name: zookeeper-logger
+  #    networks:
+  #      - logger
+  #    ports:
+  #      - "2181:2181"
+  #    volumes:
+  #      - zookeeper_data:/bitnami
+
+  #   logger-kafka:
+  #     image: bitnami/kafka:latest
+  #     environment:
+  #       KAFKA_CFG_BROKER_ID: 1
+  #       KAFKA_CFG_ZOOKEEPER_CONNECT: ${KAFKA_ZOOKEEPER_CONNECT}
+  #       KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+  #       KAFKA_CFG_ADVERTISED_LISTENERS: ${KAFKA_ADVERTISED_LISTENERS}
+  #     container_name: kafka-logger
+  #     networks:
+  #       - logger
+  #     depends_on:
+  #       - zookeeper
+  #     ports:
+  #       - "9092:9092"
+  #     volumes:
+  #       - kafka_data:/bitnami
+
+  kafka-logger:
+    image: docker.io/bitnami/kafka:3.4
+    container_name: kafka-logger
     environment:
+      KAFKA_CFG_PROCESS_ROLES: broker,controller
+      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: ${KAFKA_LISTENERS_NAMES}
+      KAFKA_CFG_LISTENERS: ${KAFKA_LISTENERS}
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: ${KAFKA_LISTENER_SECURITY_PROTOCOL_MAP}
+      KAFKA_CFG_ADVERTISED_LISTENERS: ${KAFKA_ADVERTISED_LISTENERS}
       KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: ${KAFKA_ZOOKEEPER_CONNECT}
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: ${KAFKA_ADVERTISED_LISTENERS}
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 1@127.0.0.1:9093
+      KAFKA_CFG_NODE_ID: 1
+      KAFKA_CFG_NUM_PARTITIONS: 2
+    networks:
+      - logger
     ports:
       - "9092:9092"
+      - "9094:9094"
+    volumes:
+      - kafka_data:/bitnami
 
   logger:
     restart: unless-stopped
@@ -25,15 +58,18 @@ services:
     environment:
       - KAFKA_HOST=${KAFKA_HOST}
     depends_on:
-      - zookeeper
-      - kafka
+      - kafka-logger
     networks:
-      - backend
+      - logger
     ports:
       - "3009:3009"
-    volumes:
-      - .:/logger
+
+volumes:
+  zookeeper_data:
+    driver: local
+  kafka_data:
+    driver: local
 
 networks:
-  backend:
+  logger:
     driver: bridge

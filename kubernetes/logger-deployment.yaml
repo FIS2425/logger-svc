@@ -29,7 +29,7 @@ spec:
                 secretKeyRef:
                   name: logger-secrets
                   key: KAFKA_HOST
-          image: logger
+          image: ghcr.io/fis2425/logger:latest
           name: logger
           ports:
             - containerPort: 3009

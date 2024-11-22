@@ -25,7 +25,7 @@ client.createTopics(['microservice-logs', 'gateway-logs'], (err, _) => {
 
   gatewayConsumer.on('error', (err) => console.error('Error consuming logs', err));
 
-  const PORT = process.env.PORT || 3001;
+  const PORT = process.env.PORT || 3009;
 
   const app = api();
 

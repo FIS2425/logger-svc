@@ -1,35 +1,34 @@
-import { KafkaClient, Consumer } from 'kafka-node';
+import { Kafka } from 'kafkajs';
 import api from '../api.js';
 
-const client = new KafkaClient({ kafkaHost: process.env.KAFKA_HOST });
+const client = new Kafka({
+  clientId: 'logger',
+  brokers: [process.env.KAFKA_HOST]
+});
+const admin = client.admin();
+const consumer = client.consumer({ groupId: 'logger-consumer' })
 
-client.createTopics(['microservice-logs', 'gateway-logs'], (err, _) => {
-  if (err) {
-    console.error('Error creating topic:', err);
-  }
-  console.log(_);
-  const microserviceConsumer = new Consumer(client, [{ topic: 'microservice-logs', partition: 0 }], { autoCommit: true });
-  const gatewayConsumer = new Consumer(client, [{ topic: 'gateway-logs', partition: 0 }], { autoCommit: true });
+await admin.connect();
+await admin.createTopics({
+  topics: [
+    { topic: 'microservice-logs' },
+    { topic: 'gateway-logs' }
+  ],
+});
+await admin.disconnect();
 
-  microserviceConsumer.on('message', (message) => {
-    console.log('Log received:', message.value);
-    // Here, you can save the logs to a database or forward them to a monitoring tool
-  });
+await consumer.connect()
+await consumer.subscribe({ topics: ['microservice-logs', 'gateway-logs'] })
+await consumer.run({
+  eachMessage: async ({ topic, partition, message }) => {
+    console.log(message.value.toString())
+  },
+})
 
-  microserviceConsumer.on('error', (err) => console.error('Error consuming logs', err));
+const PORT = process.env.PORT || 3009;
 
-  gatewayConsumer.on('message', (message) => {
-    console.log('Log received:', message.value);
-    // Here, you can save the logs to a database or forward them to a monitoring tool
-  });
+const app = api();
 
-  gatewayConsumer.on('error', (err) => console.error('Error consuming logs', err));
-
-  const PORT = process.env.PORT || 3009;
-
-  const app = api();
-
-  app.listen(PORT, () => {
-    console.log(`Servidor escuchando en http://localhost:${PORT}`);
-  });
+app.listen(PORT, () => {
+  console.log(`Servidor escuchando en http://localhost:${PORT}`);
 });

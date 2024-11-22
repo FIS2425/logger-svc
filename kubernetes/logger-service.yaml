@@ -10,7 +10,8 @@ metadata:
 spec:
   type: LoadBalancer
   ports:
-    - name: "3009"
+    - protocol: TCP
+      name: "3009"
       port: 3009
       targetPort: 3009
       nodePort: 30009

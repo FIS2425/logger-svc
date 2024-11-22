@@ -12,8 +12,6 @@ spec:
   selector:
     matchLabels:
       io.kompose.service: logger
-  strategy:
-    type: Recreate
   template:
     metadata:
       annotations:
@@ -34,11 +32,4 @@ spec:
           ports:
             - containerPort: 3009
               protocol: TCP
-          volumeMounts:
-            - mountPath: /logger
-              name: logger-cm0
       restartPolicy: Always
-      volumes:
-        - configMap:
-            name: logger-cm0
-          name: logger-cm0

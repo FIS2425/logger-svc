@@ -28,7 +28,17 @@ spec:
                   name: logger-secrets
                   key: KAFKA_HOST
           image: ghcr.io/fis2425/logger:latest
+          imagePullPolicy: Always
           name: logger
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 3009
+              httpHeaders:
+              - name: Custom-Header
+                value: Awesome
+            initialDelaySeconds: 15
+            periodSeconds: 5
           ports:
             - containerPort: 3009
               protocol: TCP

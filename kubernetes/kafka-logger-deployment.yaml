@@ -66,6 +66,15 @@ spec:
               value: broker,controller
           image: docker.io/bitnami/kafka:3.9
           name: kafka-logger
+          livenessProbe:
+            exec:
+              command:
+              - kafka-topics.sh
+              - --list
+              - --bootstrap-server
+              - localhost:9092
+            initialDelaySeconds: 30
+            periodSeconds: 20
           ports:
             - containerPort: 9092
               protocol: TCP

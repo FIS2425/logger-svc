@@ -14,8 +14,12 @@ export default function () {
   app.use(express.urlencoded({ extended: true }));
   app.use(cookieParser());
 
-  app.get('/', (req, res) => {
+  app.get('/', (_req, res) => {
     res.send('API funcionando correctamente');
+  });
+
+  app.get('/healthz', (_req, res) => {
+    res.status(200).send('OK');
   });
 
   app.use('/docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));

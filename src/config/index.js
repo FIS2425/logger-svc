@@ -28,6 +28,7 @@ await consumer.run({
     console.log(message.value.toString())
 
     const log = JSON.parse(message.value.toString());
+    console.log(log);
 
     if ((log.params && log.params.request_id) || log.request_id) {
       const requestId = log.params.request_id || log.request_id;

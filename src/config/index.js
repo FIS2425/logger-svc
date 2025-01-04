@@ -2,6 +2,10 @@ import { Kafka } from 'kafkajs';
 import AWS from 'aws-sdk';
 import api from '../api.js';
 
+console.log('KAFKA_HOST', process.env.KAFKA_HOST);
+console.log('AWS_REGION', process.env.AWS_REGION);
+console.log('S3_BUCKET_NAME', process.env.S3_BUCKET_NAME);
+
 const client = new Kafka({
   clientId: 'logger',
   brokers: [process.env.KAFKA_HOST]

@@ -29,8 +29,8 @@ await consumer.run({
 
     const log = JSON.parse(message.value.toString());
 
-    if (log.params.request_id) {
-      const { params: { request_id: requestId } } = log;
+    if (log.params.request_id || log.request_id) {
+      const requestId = log.params.request_id || log.request_id;
 
       if (!logsByRequestId[requestId]) {
         logsByRequestId[requestId] = [];

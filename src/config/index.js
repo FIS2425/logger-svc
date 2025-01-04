@@ -25,6 +25,7 @@ const s3 = new AWS.S3({
 });
 
 async function uploadLogsToS3(requestId, logs) {
+  console.log('Uploading logs to S3...');
   const fileContent = JSON.stringify(logs, null, 2);
   const fileName = `logs/${requestId}-${Date.now()}.json`;
 
@@ -52,7 +53,10 @@ await consumer.run({
     console.log(message.value.toString())
 
     const log = JSON.parse(message.value.toString());
+    console.log(log);
     const { requestId, message: logMessage } = log;
+    console.log('REQUESTID', requestId);
+    console.log('MESSAGE', logMessage);
 
     if (requestId) {
       if (!logsByRequestId[requestId]) {

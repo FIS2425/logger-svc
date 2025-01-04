@@ -27,6 +27,26 @@ spec:
                 secretKeyRef:
                   name: logger-secrets
                   key: KAFKA_HOST
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: logger-secrets
+                  key: AWS_ACCESS_KEY_ID
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: logger-secrets
+                  key: AWS_SECRET_ACCESS_KEY
+            - name: AWS_REGION
+              valueFrom:
+                secretKeyRef:
+                  name: logger-secrets
+                  key: AWS_REGION
+            - name: S3_BUCKET_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: logger-secrets
+                  key: S3_BUCKET_NAME
           image: ghcr.io/fis2425/logger:latest
           imagePullPolicy: Always
           name: logger

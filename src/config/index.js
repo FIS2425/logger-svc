@@ -30,7 +30,7 @@ await consumer.run({
     const log = JSON.parse(message.value.toString());
 
     if ((log.params && log.params.request_id) || log.requestId) {
-      const requestId = log.params.request_id || log.requestId;
+      const requestId = log.params ? log.params.request_id : log.requestId;
 
       console.log(`Received log for request ${requestId} in service ${log.service}`);
 

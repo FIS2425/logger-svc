@@ -9,7 +9,9 @@ const s3 = new AWS.S3({
 });
   
 export async function uploadLogsToS3(requestId, logs) {
-  const fileContent = JSON.stringify(logs, null, 2);
+  const sortedLogs = logs.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+
+  const fileContent = JSON.stringify(sortedLogs, null, 2);
   const fileName = `logs/${requestId}.json`;
   
   const params = {

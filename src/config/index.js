@@ -54,7 +54,7 @@ await consumer.run({
 
     const log = JSON.parse(message.value.toString());
     console.log(log);
-    const { requestId, message: logMessage } = log;
+    const { message: logMessage, params: { request_id: requestId } } = log;
     console.log('REQUESTID', requestId);
     console.log('MESSAGE', logMessage);
 

@@ -2,10 +2,6 @@ import { Kafka } from 'kafkajs';
 import AWS from 'aws-sdk';
 import api from '../api.js';
 
-console.log('KAFKA_HOST', process.env.KAFKA_HOST);
-console.log('AWS_REGION', process.env.AWS_REGION);
-console.log('S3_BUCKET_NAME', process.env.S3_BUCKET_NAME);
-
 const client = new Kafka({
   clientId: 'logger',
   brokers: [process.env.KAFKA_HOST]
@@ -26,6 +22,8 @@ const s3 = new AWS.S3({
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
   region: process.env.AWS_REGION,
+  endpoint: `https://s3.${process.env.AWS_REGION}.amazonaws.com`,
+  s3ForcePathStyle: true,
 });
 
 async function uploadLogsToS3(requestId, logs) {
@@ -57,10 +55,8 @@ await consumer.run({
     console.log(message.value.toString())
 
     const log = JSON.parse(message.value.toString());
-    console.log(log);
     const { message: logMessage, params: { request_id: requestId } } = log;
-    console.log('REQUESTID', requestId);
-    console.log('MESSAGE', logMessage);
+
 
     if (requestId) {
       if (!logsByRequestId[requestId]) {

@@ -32,6 +32,8 @@ await consumer.run({
     if ((log.params && log.params.request_id) || log.request_id) {
       const requestId = log.params.request_id || log.request_id;
 
+      console.log(`Received log for request ${requestId} in service ${log.service}`);
+
       if (!logsByRequestId[requestId]) {
         logsByRequestId[requestId] = [];
       }

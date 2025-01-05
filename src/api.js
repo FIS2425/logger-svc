@@ -4,6 +4,7 @@ import swaggerUI from 'swagger-ui-express';
 import YAML from 'yamljs';
 import cookieParser from 'cookie-parser';
 import AWS from 'aws-sdk';
+import { verifyAdminAuth } from './middleware/verifyAdminAuth.js';
 
 const swaggerDocument = YAML.load('./openapi.yaml');
 
@@ -23,15 +24,6 @@ export default function () {
   app.use(express.urlencoded({ extended: true }));
   app.use(cookieParser());
 
-  const checkToken = (req, res, next) => {
-    if (req.cookies && req.cookies.token) {
-      console.log('Token found:', req.cookies.token);
-    } else {
-      console.log('Token not found');
-    }
-    next();
-  };
-
   app.get('/', (_req, res) => {
     res.send('API funcionando correctamente');
   });
@@ -40,7 +32,7 @@ export default function () {
     res.status(200).send('OK');
   });
 
-  app.get('/logs', checkToken, async (_req, res) => {
+  app.get('/logs', verifyAdminAuth, async (_req, res) => {
     const params = {
       Bucket: process.env.S3_BUCKET_NAME,
       Prefix: 'logs/',
@@ -64,7 +56,7 @@ export default function () {
     }
   });
 
-  app.get('/logs/:requestId', checkToken, async (req, res) => {
+  app.get('/logs/:requestId', verifyAdminAuth, async (req, res) => {
     const { requestId } = req.params;
     const fileName = `logs/${requestId}.json`;
 

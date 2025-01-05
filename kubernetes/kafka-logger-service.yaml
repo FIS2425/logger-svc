@@ -8,14 +8,10 @@ metadata:
     io.kompose.service: kafka-logger
   name: kafka-logger
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   ports:
     - name: "internal"
       port: 9092
       targetPort: 9092
-    - name: "external"
-      port: 30092
-      targetPort: 30092
-      nodePort: 30092
   selector:
     io.kompose.service: kafka-logger

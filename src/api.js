@@ -31,6 +31,30 @@ export default function () {
     res.status(200).send('OK');
   });
 
+  app.get('/logs', async (_req, res) => {
+    const params = {
+      Bucket: process.env.S3_BUCKET_NAME,
+      Prefix: 'logs/',
+    };
+  
+    try {
+      const data = await s3.listObjectsV2(params).promise();
+  
+      const logs = data.Contents
+        .filter((item) => item.Key.endsWith('.json'))
+        .map((item) => ({
+          requestId: item.Key.replace('logs/', '').replace('.json', ''),
+          timestamp: item.LastModified,
+        }))
+        .sort((a, b) => b.timestamp - a.timestamp);
+  
+      res.json({ logs });
+    } catch (error) {
+      console.error(`Error fetching logs: ${error.message}`);
+      res.status(500).json({ error: 'An error occurred while fetching logs' });
+    }
+  });
+
   app.get('/logs/:requestId', async (req, res) => {
     const { requestId } = req.params;
     const fileName = `logs/${requestId}.json`;

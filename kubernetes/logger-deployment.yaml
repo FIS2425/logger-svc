@@ -47,6 +47,11 @@ spec:
                 secretKeyRef:
                   name: logger-secrets
                   key: S3_BUCKET_NAME
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: logger-secrets
+                  key: JWT_SECRET
           image: ghcr.io/fis2425/logger:latest
           imagePullPolicy: Always
           name: logger

@@ -17,6 +17,8 @@ const s3 = new AWS.S3({
 });
 
 export default function () {
+  const API_PREFIX = process.env.API_PREFIX || '/api/v1';
+
   const app = express();
 
   app.use(cors());
@@ -32,15 +34,15 @@ export default function () {
     res.status(200).send('OK');
   });
 
-  app.get('/logs', verifyAdminAuth, async (_req, res) => {
+  app.get(`${API_PREFIX}/logs`, verifyAdminAuth, async (_req, res) => {
     const params = {
       Bucket: process.env.S3_BUCKET_NAME,
       Prefix: 'logs/',
     };
-  
+
     try {
       const data = await s3.listObjectsV2(params).promise();
-  
+
       const logs = data.Contents
         .filter((item) => item.Key.endsWith('.json'))
         .map((item) => ({
@@ -48,7 +50,7 @@ export default function () {
           timestamp: item.LastModified,
         }))
         .sort((a, b) => b.timestamp - a.timestamp);
-  
+
       res.json({ logs });
     } catch (error) {
       console.error(`Error fetching logs: ${error.message}`);
@@ -56,7 +58,7 @@ export default function () {
     }
   });
 
-  app.get('/logs/:requestId', verifyAdminAuth, async (req, res) => {
+  app.get(`${API_PREFIX}/logs/:requestId`, verifyAdminAuth, async (req, res) => {
     const { requestId } = req.params;
     const fileName = `logs/${requestId}.json`;
 

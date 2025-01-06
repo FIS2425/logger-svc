@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import logger from '../config/logger.js';
 
 export const verifyAdminAuth = (req, res, next) => {
-  const token = req.cookies.token
+  const token = req.cookies && req.cookies.token
 
   if (!token) {
     logger.error('Error on token validation', {

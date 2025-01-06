@@ -75,6 +75,7 @@ spec:
               - localhost:9092
             initialDelaySeconds: 30
             periodSeconds: 20
+            timeoutSeconds: 5
           ports:
             - containerPort: 9092
               protocol: TCP

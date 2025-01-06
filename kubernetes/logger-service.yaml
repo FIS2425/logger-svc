@@ -8,12 +8,11 @@ metadata:
     io.kompose.service: logger
   name: logger
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   ports:
     - protocol: TCP
       name: "3009"
       port: 3009
       targetPort: 3009
-      nodePort: 30009
   selector:
     io.kompose.service: logger
